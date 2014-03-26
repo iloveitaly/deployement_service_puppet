@@ -34,7 +34,30 @@ server {
     break;
   }
 
-  error_page 500 502 503 504 /500.html;
+  set $maintenance 0;
+
+  if (-f /home/<%= app_name %>/maintenance) {
+    set $maintenance 1;
+  }
+
+  if ($request_uri ~* ^/assets) {
+    set $maintenance 0;
+  }
+
+  if ($maintenance) {
+    return 503;
+  }
+
+  error_page 503 @maintenance;
+
+  location @maintenance {
+    if ($uri !~ ^/assets/) {
+      rewrite ^(.*)$ /503.html break;
+    }
+    return 200;
+  }
+
+  error_page 500 502 504 /500.html;
   location = /500.html {
     root /data/<%= app_name %>/current/public;
   }
