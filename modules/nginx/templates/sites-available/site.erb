@@ -29,6 +29,7 @@ server {
   }
 
   location ~* ^/assets {
+    add_header Access-Control-Allow-Origin *;
     expires max;
     add_header Cache-Control public;
     break;
