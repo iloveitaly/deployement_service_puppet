@@ -74,3 +74,17 @@ Then you can run the deployment service from the command line:
 ```
 puppet apply manifests/site.pp --modulepath=modules
 ```
+
+Installing Latest Version of Puppet
+-----------------------------------
+
+Puppet is locked to 2.7.x on many Ubuntu (and other) distributions.
+Unfortunately the gem installation process in the deployment scripts will break when using puppet 2.7.x.
+Here is how you install puppet > 2.7:
+
+```bash
+wget http://apt.puppetlabs.com/puppetlabs-release-precise.deb
+dpkg -i puppetlabs-release-precise.deb
+apt-get update
+apt-get install puppet-common
+```
