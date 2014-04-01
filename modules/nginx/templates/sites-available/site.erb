@@ -68,3 +68,8 @@ server {
   server_name <%= server_ip %>;
   return 301 $scheme://$hostname$request_uri;
 }
+
+server {
+  server_name www.$hostname;
+  return 301 $scheme://$hostname$request_uri;
+}
