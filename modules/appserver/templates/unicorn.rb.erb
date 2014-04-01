@@ -16,6 +16,8 @@ preload_app true
 GC.respond_to?(:copy_on_write_friendly=) and  GC.copy_on_write_friendly = true
 
 before_fork do |server, worker|
+  ENV["BUNDLE_GEMFILE"] = APP_ROOT + "/current/Gemfile"
+
   defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
 
   # kills old children after zero downtime deploy
