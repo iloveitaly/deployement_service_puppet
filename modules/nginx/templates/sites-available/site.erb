@@ -63,3 +63,8 @@ server {
     root /data/<%= name %>/current/public;
   }
 }
+
+server {
+  server_name <%= server_ip %>;
+  return 301 $scheme://$hostname$request_uri;
+}
