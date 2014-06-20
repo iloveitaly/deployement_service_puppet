@@ -10,7 +10,3 @@ root	ALL=(ALL) ALL
 # (Note that later entries override this, so you might need to move
 # it further down)
 %sudo ALL=(ALL) ALL
-
-# Allow spree control upstart without providing password (capistrano)
-spree ALL=NOPASSWD: /usr/local/bin/bluepill
-

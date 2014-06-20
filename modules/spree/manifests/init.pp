@@ -21,39 +21,6 @@ define spree::app(){
     group => "www-data", 
     mode => 660 
   }
-
-  file {"/data/${name}/shared/config/Procfile":
-    content => template("spree/Procfile.erb"),
-    require => File["/data/${name}/shared/config"],
-    owner => "spree",
-    group => "www-data",
-    mode => 660
-  }
-
-  file {"/data/${name}/shared/config/.foreman":
-    content => template("spree/dot-foreman.erb"),
-    require => File["/data/${name}/shared/config"],
-    owner => "spree",
-    group => "www-data",
-    mode => 660
-  }
-
-  file {"/data/${name}/shared/config/master.pill.erb":
-    source  => "puppet:///modules/spree/bluepill_master.pill.erb",
-    require => File["/data/${name}/shared/config"],
-    owner => "spree",
-    group => "www-data",
-    mode => 660
-  }
-
-  file {"/data/${name}/shared/config/${name}.pill":
-    content => template("spree/placeholder.pill.erb"),
-    require => File["/data/${name}/shared/config"],
-    owner => "spree",
-    group => "www-data",
-    mode => 660,
-    replace => false
-  }
 }
 
 
@@ -93,16 +60,6 @@ define spree::demo(){
     require => [Exec['checkout spree-demo']]
   }
 
-  file { "/data/spree/current/Procfile":
-    ensure => "/data/spree/shared/config/Procfile",
-    require => [Exec['checkout spree-demo']]
-  }   
-
-  file { "/data/spree/current/.foreman":
-    ensure => "/data/spree/shared/config/.foreman",
-    require => [Exec['checkout spree-demo']]
-  }   
-
   exec { "bundle install demo":
     command  => "bundle install --gemfile /data/spree/releases/demo/Gemfile --path /data/spree/shared/bundle --deployment --without development test",
     user      => 'spree',
@@ -115,31 +72,6 @@ define spree::demo(){
     require   => [Exec['checkout spree-demo'], File["/data/${name}/current/config/database.yml"] ]
   }
 
-  # use subscribe here as pill gets created with a placeholder
-  # by default to let bluepill start when we're not deploying a demo
-  # so we can't use creates.
-
-  exec { "foreman export demo":
-    command => "bundle exec foreman export bluepill /data/spree/shared/config",
-    user => 'spree',
-    group => 'spree',
-    cwd => "/data/spree/releases/demo",
-    logoutput => true,
-    timeout => 300,
-    refreshonly => true,
-    subscribe => File["/data/spree/current/Procfile"],
-    require => [ File["/data/spree"], File["/data/spree/current/.foreman"], File["/data/spree/current/Procfile"], Exec["bundle install demo"] ]
-  }
-
-  exec { "restart bluepill":
-    command => "bluepill load /data/spree/shared/config/spree.pill",
-    cwd => "/data/spree/releases/demo",
-    timeout => 300,
-    logoutput => true,
-    refreshonly => true,
-    subscribe => Exec["foreman export demo"],
-  }
-
   exec { "precompile assets for demo":
     command   => "bundle exec rake assets:precompile",
     user      => 'spree',
@@ -149,7 +81,7 @@ define spree::demo(){
     timeout   => 1000,
     onlyif    => "/bin/sh -c 'bundle exec rake db:version --trace RAILS_ENV=${rails_env} | grep \"Current version: [0-9]\{5,\}\"'",
     creates   => "/data/spree/releases/demo/public/assets",
-    notify    => [Exec["restart bluepill"] ],
+    # notify    => [Exec["restart bluepill"] ],
     require   => [ Exec["bundle install demo"], File["/data/${name}/current/config/database.yml"] ]
   }
 

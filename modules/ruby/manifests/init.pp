@@ -102,7 +102,7 @@ class ruby {
     ensure => latest,
     require => file['/usr/bin/gem'] }
 
-  package { ['bundler', 'foreman', 'rake', 'backup', 'bluepill']:
+  package { ['bundler', 'rake', 'backup']:
     ensure => 'installed',
     provider => 'gem',
     require => [ Package['rubygems'], File['/usr/bin/gem'] ]

@@ -25,15 +25,4 @@ class common {
     group => "www-data",
     mode => 660
   }
-
-  file {"/etc/init/bluepill.conf":
-    content => template("common/bluepill_upstart.erb"),
-    mode => 600
-  }
-
-  service { "bluepill":
-    provider => 'upstart',
-    ensure => 'running',
-    require => [ Spree::App[$app_name], File['/etc/init/bluepill.conf'], Package['bluepill'] ]
-  }
 }
